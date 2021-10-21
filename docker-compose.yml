@@ -1,0 +1,6 @@
+version: '3.1'
+services:
+  web:
+    image: zi-odoo
+    ports:
+      - "8061:8069"
