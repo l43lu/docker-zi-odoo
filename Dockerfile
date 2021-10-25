@@ -97,10 +97,13 @@ WORKDIR /home/odoo/odoo/
 
 RUN apt upgrade gcc -y
 
+RUN apt install nano -y
+
 RUN pip3 install setuptools wheel
+COPY requirements.txt ./
 RUN pip3 install -r requirements.txt
 
-#RUN python3 odoo-bin --addons-path=addons -d mydb
+RUN python3 odoo-bin --addons-path=addons -d mydb
 
 EXPOSE 8069
 
