@@ -102,6 +102,8 @@ RUN apt install nano -y
 RUN pip3 install setuptools wheel
 COPY requirements.txt ./
 RUN pip3 install -r requirements.txt
+RUN pip3 install psycopg2
+
 
 RUN python3 odoo-bin --addons-path=addons -d mydb
 
