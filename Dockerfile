@@ -1,18 +1,20 @@
 FROM ubuntu:21.04
 
 RUN apt update
+RUN useradd -m odoo_ubuntu
+RUN echo "odoo_ubuntu:cleartext_password" | chpasswd
+#USER odoo_ubuntu
 
-RUN apt install software-properties-common -y
+
+# Install some tools
+RUN apt install -y software-properties-common
 RUN apt install -y wget
+RUN apt install -y lsb-release && apt-get clean all
+RUN apt install -y nano
+RUN apt install -y mlocate
 
 
-#RUN apt install python3 -y
-#RUN apt install python3-pip -y
-
-RUN apt-get install -y lsb-release && apt-get clean all
-
-
-RUN apt-get install -y libturbojpeg
+RUN apt install -y libturbojpeg
 
 # Install some deps, lessc and less-plugin-clean-css, and wkhtmltopdf
 RUN apt-get update && \
@@ -43,19 +45,30 @@ RUN apt-get update && \
         python3-xlrd \
         python3-xlwt \
         xz-utils
-    #&& curl -o wkhtmltox.deb -sSL https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.buster_amd64.deb \
-    #&& echo 'ea8277df4297afc507c61122f3c349af142f31e5 wkhtmltox.deb' | sha1sum -c - \
-    #&& apt-get install -y --no-install-recommends ./wkhtmltox.deb \
-    #&& rm -rf /var/lib/apt/lists/* wkhtmltox.deb
+
+# Install wkhtmltopdf
 
 RUN wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.focal_amd64.deb
 RUN apt install -y ./wkhtmltox_0.12.6-1.focal_amd64.deb
 
 
-#
-#
-#RUN apt install postgresql -y
-#RUN apt install software-properties-common -y
+# Install DB
+RUN apt install -y postgresql postgresql-client
+RUN PATH="/usr/bin/psql"
+SHELL ["/bin/bash", "-c", "source /etc/environment && export PATH"]
+#RUN 
+SHELL ["/bin/sh", "-c"]
+
+
+USER postgres
+SHELL ["/bin/sh", "-c", "/etc/init.d/postgresql start"]
+RUN psql -c "create user odoo_db_user"
+RUN psql -c "alter user odoo_db_user with password 'StrongAdminP@ssw0rd'"
+RUN psql -c "create database odoo_db owner odoo_db_user"
+#RUN postgres createuser -s odoo_db
+#RUN createdb odoo_db
+
+
 #
 #
 ##RUN wget -O - https://nightly.odoo.com/odoo.key | apt-key add -
@@ -64,18 +77,14 @@ RUN apt install -y ./wkhtmltox_0.12.6-1.focal_amd64.deb
 #
 RUN apt-get install -y git
 
-RUN mkdir /home/odoo/
-WORKDIR /home/odoo
+#RUN mkdir /home/odoo/
+WORKDIR /home/odoo_ubuntu
 
-RUN git clone https://github.com/odoo/odoo.git
+#RUN git clone https://github.com/odoo/odoo.git
+#WORKDIR /home/odoo_ubuntu/odoo/
 
 
 
-#RUN postgres createuser -s $USER
-#RUN createdb $USER
-#
-#
-#
 RUN apt-get install -y python3-dev \ 
     libxml2-dev \
     libxslt1-dev \
@@ -93,16 +102,22 @@ RUN apt-get install -y python3-dev \
     libxcb1-dev \
     libpq-dev
 
-WORKDIR /home/odoo/odoo/
 
 RUN apt upgrade gcc -y
 
-RUN apt install nano -y
 
-RUN pip3 install setuptools wheel
-COPY requirements.txt ./
-RUN pip3 install -r requirements.txt
-RUN pip3 install psycopg2
+# Install required packages from odoo
+#RUN pip3 install setuptools wheel
+#COPY requirements.txt ./
+#RUN pip3 install -r requirements.txt
+#RUN pip3 install psycopg2
+
+
+
+
+# Right to left interface support
+RUN apt-get install nodejs npm -y
+RUN npm install -g rtlcss
 
 
 RUN python3 odoo-bin --addons-path=addons -d mydb
