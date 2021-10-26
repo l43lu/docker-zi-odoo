@@ -65,21 +65,19 @@ RUN apt install -y ./wkhtmltox_0.12.6-1.focal_amd64.deb
 RUN apt install -y postgresql postgresql-client
 RUN PATH="/usr/bin/psql"
 SHELL ["/bin/bash", "-c", "source /etc/environment && export PATH"]
-#RUN 
+##RUN 
 SHELL ["/bin/sh", "-c"]
-
-
-USER postgres
-SHELL ["/bin/sh", "-c", "/etc/init.d/postgresql start"]
-RUN psql -c "create user odoo_db_user"
-RUN psql -c "alter user odoo_db_user with password 'StrongAdminP@ssw0rd'"
-RUN psql -c "create database odoo_db owner odoo_db_user"
-#RUN postgres createuser -s odoo_db
-#RUN createdb odoo_db
-
-
 #
 #
+#USER postgres
+#SHELL ["/bin/sh", "-c", "/etc/init.d/postgresql start"]
+#RUN psql -c "create user odoo_db_user"
+#RUN psql -c "alter user odoo_db_user with password 'StrongAdminP@ssw0rd'"
+#RUN psql -c "create database odoo_db owner odoo_db_user"
+
+
+
+########
 ##RUN wget -O - https://nightly.odoo.com/odoo.key | apt-key add -
 ##RUN echo "deb http://nightly.odoo.com/13.0/nightly/deb/ ./" >> /etc/apt/sources.list.d/odoo.list
 ##RUN apt-get update && apt-get install odoo
@@ -127,8 +125,11 @@ RUN pip3 install psycopg2
 RUN apt-get install nodejs npm -y
 RUN npm install -g rtlcss
 
+COPY odoo_db.sh ./
+
+
 #USER odoo_ubuntu
-RUN python3 odoo-bin --addons-path=addons -d mydb
+#RUN python3 odoo-bin --addons-path=addons -d mydb
 
 EXPOSE 8069
 
