@@ -141,4 +141,5 @@ EXPOSE 8069
 #RUN psql -c "alter user odoo_ubuntu createdb"
 #
 #USER odoo_ubuntu
-#RUN python3 odoo-bin --addons-path=addons -d mydb
+CMD ["/etc/init.d/postgresql start", "start"]
+CMD python3 odoo-bin --addons-path=addons -d mydb
