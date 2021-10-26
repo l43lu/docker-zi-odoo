@@ -3,7 +3,14 @@ FROM ubuntu:21.04
 RUN apt update
 RUN useradd -m odoo_ubuntu
 RUN echo "odoo_ubuntu:cleartext_password" | chpasswd
-#USER odoo_ubuntu
+
+RUN usermod -a -G odoo_ubuntu odoo_ubuntu
+#Assign group ownership in /etc/init.d to odoo_ubuntu group
+RUN chgrp -R odoo_ubuntu /etc/init.d
+# Assign group write access
+RUN chmod -R g+rwX /etc/init.d
+# all new files created in that directory will be owned by the odoo_ubuntu group by default:
+RUN chmod g+s /etc/init.d
 
 
 # Install some tools
@@ -12,6 +19,8 @@ RUN apt install -y wget
 RUN apt install -y lsb-release && apt-get clean all
 RUN apt install -y nano
 RUN apt install -y mlocate
+RUN apt install -y less
+
 
 
 RUN apt install -y libturbojpeg
@@ -80,9 +89,8 @@ RUN apt-get install -y git
 #RUN mkdir /home/odoo/
 WORKDIR /home/odoo_ubuntu
 
-#RUN git clone https://github.com/odoo/odoo.git
-#WORKDIR /home/odoo_ubuntu/odoo/
-
+RUN git clone https://github.com/odoo/odoo.git
+WORKDIR /home/odoo_ubuntu/odoo/
 
 
 RUN apt-get install -y python3-dev \ 
@@ -107,10 +115,10 @@ RUN apt upgrade gcc -y
 
 
 # Install required packages from odoo
-#RUN pip3 install setuptools wheel
-#COPY requirements.txt ./
-#RUN pip3 install -r requirements.txt
-#RUN pip3 install psycopg2
+RUN pip3 install setuptools wheel
+COPY requirements.txt ./
+RUN pip3 install -r requirements.txt
+RUN pip3 install psycopg2
 
 
 
@@ -119,7 +127,7 @@ RUN apt upgrade gcc -y
 RUN apt-get install nodejs npm -y
 RUN npm install -g rtlcss
 
-
+#USER odoo_ubuntu
 RUN python3 odoo-bin --addons-path=addons -d mydb
 
 EXPOSE 8069
