@@ -1,3 +1,6 @@
+:set fileformat=unix
+
+
 /etc/init.d/postgresql start
 su postgres
 psql
