@@ -126,6 +126,7 @@ RUN apt-get install nodejs npm -y
 RUN npm install -g rtlcss
 
 COPY odoo_db.sh ./
+RUN chmod +x odoo_db.sh
 RUN ./odoo_db.sh
 
 
