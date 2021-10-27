@@ -126,21 +126,11 @@ RUN apt-get install nodejs npm -y
 RUN npm install -g rtlcss
 
 COPY odoo_db.sh ./
+COPY start_services.sh ./
 RUN chmod +x odoo_db.sh
+RUN chmod +x start_services.sh
 RUN ./odoo_db.sh
 
 
-#USER odoo_ubuntu
-#RUN python3 odoo-bin --addons-path=addons -d mydb
-
 EXPOSE 8069
-
-#SHELL ["/bin/sh", "-c", "/etc/init.d/postgresql start"]
-#USER postgres
-#RUN whoami
-#RUN psql -c "create user odoo_ubuntu"
-#RUN psql -c "alter user odoo_ubuntu createdb"
-#
-#USER odoo_ubuntu
-CMD ["/etc/init.d/postgresql start", "start"]
 CMD python3 odoo-bin --addons-path=addons -d mydb
