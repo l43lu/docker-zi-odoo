@@ -5,3 +5,10 @@ services:
     command: /home/odoo_ubuntu/odoo/./start_services.sh
     ports:
       - "8061:8069"
+      - "5432:5432"
+    volumes:
+      - ./odoo_addons:/home/odoo_ubuntu/odoo/doc
+      - /var/lib/postgresql
+
+volumes:
+  odoo_addons:
