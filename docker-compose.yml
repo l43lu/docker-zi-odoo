@@ -7,8 +7,9 @@ services:
       - "8061:8069"
       - "5432:5432"
     volumes:
-      - ./odoo_addons:/home/odoo_ubuntu/odoo/doc
+      #- ./odoo_addons:/home/odoo_ubuntu/odoo/doc
+      - ./odoo_copy/odoo:/home/odoo_ubuntu/odoo
       - /var/lib/postgresql
 
 volumes:
-  odoo_addons:
+  odoo_copy:
